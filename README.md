@@ -1,8 +1,6 @@
 # Employee CRUD App
 
-This is a simple study project that demonstrates how to build a CRUD (Create, Read, Update, Delete) application in Python using Tkinter for the GUI and MySQL for database storage.  
-
-The app allows you to manage employee records (ID, name, department) via a graphical interface.
+This is a simple study project that demonstrates how to build a CRUD (Create, Read, Update, Delete) application in Python using Tkinter for the graphical user interface (GUI) and MySQL for database storage. The app allows you to manage employee records (ID, name, department) via a graphical interface.
 
 ---
 
