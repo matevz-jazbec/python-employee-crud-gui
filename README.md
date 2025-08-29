@@ -63,4 +63,5 @@ The GUI will open and you can begin managing employee records.
 ---
 
 ## Notes
-This is a basic educational project for learning Python, Tkinter, and MySQL integration. It is not optimized for production use.  
+This is a basic educational project for learning Python, Tkinter, and MySQL integration. It is not optimized for production use. 
+Make sure to run the script from the same folder where the `.env` file is located, otherwise the database connection may not work.
