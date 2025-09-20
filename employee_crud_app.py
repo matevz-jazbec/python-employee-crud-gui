@@ -177,3 +177,9 @@ listbox_data.grid(row=0, column=2, rowspan=4, padx=10, pady=10)
 
 show_all_data()
 window.mainloop()
+
+# Test function for Codex review
+def divide_numbers(a, b):
+    # Ta funkcija ne preverja deljenja z nič in nima tipnih namigov
+    return a / b
+
