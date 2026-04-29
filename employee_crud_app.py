@@ -1,8 +1,4 @@
-"""
-Employee CRUD App with Tkinter and MySQL
-
-This script provides a simple GUI application for managing employee records. It supports Create, Read, Update, and Delete (CRUD) operations on a MySQL database. 
-"""
+"""Employee CRUD App with Tkinter and MySQL."""
 
 # --- Import required libraries ---
 from tkinter import *
@@ -30,7 +26,16 @@ def get_input_data():
 
 def reset_fields():
     """Clears all input fields."""
-    entry_id.delete(0, "end"); entry_name.delete(0, "end"); entry_dept.delete(0, "end")
+    entry_id.delete(0, "end")
+    entry_name.delete(0, "end")
+    entry_dept.delete(0, "end")
+
+def show_database_error(action, err):
+    """Displays a database error message."""
+    messagebox.showerror(
+        "Database Error",
+        f"Could not {action} employee data.\n\n{err}"
+    )
 
 # --- Data manipulation functions (CRUD operations) ---
 def insert_data():
@@ -40,15 +45,19 @@ def insert_data():
         messagebox.showwarning("Cannot Insert", "All the fields are required!")
         return
 
-    db_connection = get_db_connection()
-    cursor = db_connection.cursor()
-    
-    sql = "INSERT INTO empDetails (empID, empName, empDept) VALUES (%s, %s, %s)"
-    val = (emp_id, name, dept)
-    cursor.execute(sql, val)
-    
-    db_connection.commit()
-    db_connection.close()
+    try:
+        db_connection = get_db_connection()
+        cursor = db_connection.cursor()
+
+        sql = "INSERT INTO empDetails (empID, empName, empDept) VALUES (%s, %s, %s)"
+        val = (emp_id, name, dept)
+        cursor.execute(sql, val)
+
+        db_connection.commit()
+        db_connection.close()
+    except mysql.connector.Error as err:
+        show_database_error("insert", err)
+        return
     
     reset_fields()
     show_all_data()
@@ -61,15 +70,19 @@ def update_data():
         messagebox.showwarning("Cannot Update", "All the fields are required!")
         return
 
-    db_connection = get_db_connection()
-    cursor = db_connection.cursor()
-    
-    sql = "UPDATE empDetails SET empName = %s, empDept = %s WHERE empID = %s"
-    val = (name, dept, emp_id)
-    cursor.execute(sql, val)
-    
-    db_connection.commit()
-    db_connection.close()
+    try:
+        db_connection = get_db_connection()
+        cursor = db_connection.cursor()
+
+        sql = "UPDATE empDetails SET empName = %s, empDept = %s WHERE empID = %s"
+        val = (name, dept, emp_id)
+        cursor.execute(sql, val)
+
+        db_connection.commit()
+        db_connection.close()
+    except mysql.connector.Error as err:
+        show_database_error("update", err)
+        return
 
     reset_fields()
     show_all_data()
@@ -82,31 +95,41 @@ def get_data():
         messagebox.showwarning("Fetch Status", "Please provide the Employee ID.")
         return
 
-    db_connection = get_db_connection()
-    cursor = db_connection.cursor()
-    
-    sql = "SELECT * FROM empDetails WHERE empID = %s"
-    val = (emp_id,)
-    cursor.execute(sql, val)
-    row = cursor.fetchone()
-    
-    db_connection.close()
+    try:
+        db_connection = get_db_connection()
+        cursor = db_connection.cursor()
+
+        sql = "SELECT * FROM empDetails WHERE empID = %s"
+        val = (emp_id,)
+        cursor.execute(sql, val)
+        row = cursor.fetchone()
+
+        db_connection.close()
+    except mysql.connector.Error as err:
+        show_database_error("fetch", err)
+        return
 
     if row:
-        entry_name.delete(0, "end"); entry_dept.delete(0, "end")
-        entry_name.insert(0, row[1]); entry_dept.insert(0, row[2])
+        entry_name.delete(0, "end")
+        entry_dept.delete(0, "end")
+        entry_name.insert(0, row[1])
+        entry_dept.insert(0, row[2])
     else:
         messagebox.showwarning("Fetch Status", "No data found for the provided ID")
 
 def show_all_data():
     """Displays all records from the empDetails table in the listbox."""
-    db_connection = get_db_connection()
-    cursor = db_connection.cursor()
-    
-    cursor.execute("SELECT * FROM empDetails")
-    rows = cursor.fetchall()
-    
-    db_connection.close()
+    try:
+        db_connection = get_db_connection()
+        cursor = db_connection.cursor()
+
+        cursor.execute("SELECT * FROM empDetails")
+        rows = cursor.fetchall()
+
+        db_connection.close()
+    except mysql.connector.Error as err:
+        show_database_error("load", err)
+        return
     
     listbox_data.delete(0, "end")
     for row in rows:
@@ -120,24 +143,31 @@ def delete_data():
         messagebox.showwarning("Cannot Delete", "Please provide the Employee ID.")
         return
 
-    db_connection = get_db_connection()
-    cursor = db_connection.cursor()
-    
-    sql = "DELETE FROM empDetails WHERE empID = %s"
-    val = (emp_id,)
-    cursor.execute(sql, val)
-    
-    db_connection.commit()
-    db_connection.close()
+    try:
+        db_connection = get_db_connection()
+        cursor = db_connection.cursor()
+
+        sql = "DELETE FROM empDetails WHERE empID = %s"
+        val = (emp_id,)
+        cursor.execute(sql, val)
+
+        db_connection.commit()
+        deleted_rows = cursor.rowcount
+        db_connection.close()
+    except mysql.connector.Error as err:
+        show_database_error("delete", err)
+        return
+
+    if deleted_rows == 0:
+        messagebox.showwarning("Delete Status", "No data found for the provided ID")
+        return
     
     reset_fields()
     show_all_data()
     messagebox.showinfo("Delete Status", "Data deleted successfully")
 
 # --- Graphical User Interface (GUI) ---
-"""
-GUI with input fields for ID, name, department, buttons for CRUD operations, and a listbox for displaying data.
-"""
+# GUI with input fields, buttons, and a listbox for displaying data.
 window = Tk()
 window.geometry("600x270")
 window.title("Employee CRUD App")
@@ -160,15 +190,45 @@ entry_dept.grid(row=2, column=1, padx=10, pady=5)
 button_frame = Frame(window)
 button_frame.grid(row=3, column=0, columnspan=2, pady=10)
 
-insert_btn = Button(button_frame, text="Insert", font=("Sans", 12), bg="white", command=insert_data)
+insert_btn = Button(
+    button_frame,
+    text="Insert",
+    font=("Sans", 12),
+    bg="white",
+    command=insert_data
+)
 insert_btn.grid(row=0, column=0, padx=5)
-update_btn = Button(button_frame, text="Update", font=("Sans", 12), bg="white", command=update_data)
+update_btn = Button(
+    button_frame,
+    text="Update",
+    font=("Sans", 12),
+    bg="white",
+    command=update_data
+)
 update_btn.grid(row=0, column=1, padx=5)
-get_btn = Button(button_frame, text="Fetch", font=("Sans", 12), bg="white", command=get_data)
+get_btn = Button(
+    button_frame,
+    text="Fetch",
+    font=("Sans", 12),
+    bg="white",
+    command=get_data
+)
 get_btn.grid(row=0, column=2, padx=5)
-delete_btn = Button(button_frame, text="Delete", font=("Sans", 12), bg="white", command=delete_data)
+delete_btn = Button(
+    button_frame,
+    text="Delete",
+    font=("Sans", 12),
+    bg="white",
+    command=delete_data
+)
 delete_btn.grid(row=0, column=3, padx=5)
-reset_btn = Button(button_frame, text="Reset", font=("Sans", 12), bg="white", command=reset_fields)
+reset_btn = Button(
+    button_frame,
+    text="Reset",
+    font=("Sans", 12),
+    bg="white",
+    command=reset_fields
+)
 reset_btn.grid(row=1, column=0, columnspan=4, pady=5, padx=5)
 
 listbox_data = Listbox(window)

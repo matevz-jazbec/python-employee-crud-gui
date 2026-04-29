@@ -5,41 +5,54 @@ This is a simple study project that demonstrates how to build a CRUD (Create, Re
 ---
 
 ## Features
-- Insert a new employee  
-- Update employee details  
-- Fetch employee by ID 
-- Delete employee  
-- Reset input fields 
-- View all employees  
+- Insert a new employee
+- Update employee details
+- Fetch employee by ID
+- Delete employee
+- Reset input fields
+- View all employees
 
 ---
 
 ## Requirements
 - Python 3
-- MySQL server  
-- Installed Python packages:  
-  ```bash
-  pip install mysql-connector-python python-dotenv
-  ```
+- MySQL server
+
+---
+
+## Installation
+Install the required Python packages:
+
+```bash
+pip install -r requirements.txt
+```
 
 ---
 
 ## Database Setup
-Create a database (e.g. `employee`):  
-   ```sql
-   CREATE DATABASE employee;
-   USE employee;
-   CREATE TABLE empDetails (
-       empID INT PRIMARY KEY,
-       empName VARCHAR(50),
-       empDept VARCHAR(50)
-   );
-   ```
+Create a database (e.g. `employee`):
+
+```sql
+CREATE DATABASE employee;
+USE employee;
+CREATE TABLE empDetails (
+    empID INT PRIMARY KEY,
+    empName VARCHAR(50),
+    empDept VARCHAR(50)
+);
+```
 
 ---
 
 ## Configuration
-Database credentials are stored in a `.env` file in the project root:
+Database credentials are stored in a `.env` file in the project root.
+Create it from the example file:
+
+```bash
+cp .env.example .env
+```
+
+Then update `.env` with your MySQL credentials:
 
 ```
 DB_HOST=localhost
@@ -63,5 +76,5 @@ The GUI will open and you can begin managing employee records.
 ---
 
 ## Notes
-This is a basic educational project for learning Python, Tkinter, and MySQL integration. It is not optimized for production use. 
+This is a basic educational project for learning Python, Tkinter, and MySQL integration. It is not optimized for production use.
 Make sure to run the script from the same folder where the `.env` file is located, otherwise the database connection may not work.
